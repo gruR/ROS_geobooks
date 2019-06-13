@@ -1,22 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
-<<<<<<< HEAD
 project(team_project)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
-=======
-project(turtlebot_roomba)
-
-## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
->>>>>>> origin/hanbin
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-<<<<<<< HEAD
-find_package(catkin REQUIRED)
-=======
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
@@ -24,7 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   sensor_msgs
 )
->>>>>>> origin/hanbin
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -83,11 +72,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-<<<<<<< HEAD
-#   std_msgs  # Or other packages containing msgs
-=======
 #   std_msgs
->>>>>>> origin/hanbin
 # )
 
 ################################################
@@ -121,13 +106,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-<<<<<<< HEAD
-#  LIBRARIES team_project
-#  CATKIN_DEPENDS other_catkin_pkg
-=======
 #  LIBRARIES turtlebot_roomba
 #  CATKIN_DEPENDS roscpp rospy std_msgs
->>>>>>> origin/hanbin
 #  DEPENDS system_lib
 )
 
@@ -138,22 +118,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-<<<<<<< HEAD
-# include
-# ${catkin_INCLUDE_DIRS}
-=======
   include
   ${catkin_INCLUDE_DIRS}
->>>>>>> origin/hanbin
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-<<<<<<< HEAD
-#   src/${PROJECT_NAME}/team_project.cpp
-=======
 #   src/${PROJECT_NAME}/turtlebot_roomba.cpp
->>>>>>> origin/hanbin
 # )
 
 ## Add cmake target dependencies of the library
@@ -164,11 +135,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-<<<<<<< HEAD
-# add_executable(${PROJECT_NAME}_node src/team_project_node.cpp)
-=======
-add_executable(${PROJECT_NAME}_node src/main.cpp src/Walker.cpp)
->>>>>>> origin/hanbin
+#add_executable(${PROJECT_NAME}_node src/main.cpp src/Walker.cpp)
+add_executable(lidar_node src/Walker.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -181,15 +149,9 @@ add_executable(${PROJECT_NAME}_node src/main.cpp src/Walker.cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-<<<<<<< HEAD
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
-=======
-target_link_libraries(${PROJECT_NAME}_node
+target_link_libraries(lidar_node
   ${catkin_LIBRARIES}
 )
->>>>>>> origin/hanbin
 
 #############
 ## Install ##
@@ -231,18 +193,10 @@ target_link_libraries(${PROJECT_NAME}_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-<<<<<<< HEAD
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_team_project.cpp)
-=======
 # catkin_add_gtest(${PROJECT_NAME}-test test/test_turtlebot_roomba.cpp)
->>>>>>> origin/hanbin
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
 ## Add folders to be run by python nosetests
-<<<<<<< HEAD
 # catkin_add_nosetests(test)
-=======
-# catkin_add_nosetests(test)
->>>>>>> origin/hanbin

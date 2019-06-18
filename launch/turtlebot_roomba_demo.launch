@@ -1,27 +1,14 @@
 <launch>
-<!-- Argument to facilitate recording rosbag -->
-<arg 
-    name="rosbagRecord" 
-    default = "false"
-/>
-<!-- Launch the turtlebot gazebo node -->
+
 <include file= "$(find turtlebot_gazebo)/launch/turtlebot_world.launch" >
 <arg name="world_file" value="/opt/ros/kinetic/share/turtlebot_gazebo/worlds/corridor.world"/>
 </include>
-<!-- Launch Walker Node -->
+
 <node 
     pkg = "turtlebot_roomba" 
     type = "turtlebot_roomba_node"
-    name = "turtlebot_roomba_node"
+    name = "avoid_collision_node"
     output = "screen"
 />
-<!-- Record rosbag if prompted -->
-<node
-    pkg = "rosbag"
-    name = "record"
-    type = "record"
-    args = "-a -x /camera/(.*) -O $(find turtlebot_roomba)/results/turtlebotWalker.bag"
-    output = "screen"
-    if = "$(arg rosbagRecord)"
-/>  
+
 </launch>

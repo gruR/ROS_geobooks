@@ -26,9 +26,9 @@ boost::mutex mutex;
 nav_msgs::Odometry g_odom;
 float my_linear_x;
 float my_angular_z;
-
+float avg_ang;
 float max_length=0;
-Vec4i tempv;
+
 //float robot_theta=0;
 
 void
@@ -106,7 +106,7 @@ doRotation(ros::Publisher &pubTeleop,  tf::Transform &initialTransformation,doub
     //the command will be to turn at 'rotationSpeed' rad/s
 
     geometry_msgs::Twist baseCmd;
-    baseCmd.linear.x = 0.5;
+    baseCmd.linear.x = 0.3;
     baseCmd.linear.y = 0.0;
 	int option=0;
     if(dRotation < 0.) {
@@ -188,6 +188,7 @@ void poseMessageReceivedRGB(const sensor_msgs::ImageConstPtr& msg)
 	ros::NodeHandle  nhp;
 	pub = nhp.advertise<geometry_msgs::Twist>("/cmd_vel", 100);	
 	geometry_msgs::Twist baseCmd;
+	avg_ang=0;
 
 
 
@@ -211,7 +212,7 @@ void poseMessageReceivedRGB(const sensor_msgs::ImageConstPtr& msg)
 	float hough_threshold = 15;	 // minimum number of votes(intersections in Hough grid cell)
 	float minLineLength = 10; //minimum number of pixels making up a line
 	float maxLineGap = 20;	//maximum gap in pixels between connectable line segments
-
+	int count=0;
 
 	
 
@@ -233,6 +234,7 @@ void poseMessageReceivedRGB(const sensor_msgs::ImageConstPtr& msg)
 	Mat img_line = Mat::zeros(img_rsz.rows, img_rsz.cols, CV_8UC3);
 	int width = img_line.cols;
 	int height = img_line.rows;
+Vec4i tempv;
 
 
 vector<Vec4i> newlines;
@@ -243,7 +245,7 @@ vector<Vec4i> newlines;
 
 for(int i=0; i<lines.size(); i++)
 {
-printf("yyyyyyyyyy%d %d %d %d\n", lines[i][0], lines[i][1], lines[i][2],lines[i][3]);
+//printf("yyyyyyyyyy%d %d %d %d\n", lines[i][0], lines[i][1], lines[i][2],lines[i][3]);
 newlines=lines;
 }
 
@@ -256,15 +258,16 @@ return;
 //	draw_line(img_line, lines);
 //	printf("%d %d %d %d\n",lines[0][0], lines[0][1], lines[0][2], lines[0][3]);
 
-for (int i = 0; i < newlines.size(); i++)
+	for (int i = 0; i < newlines.size(); i++)
 	{
 		 Vec4i l = newlines[i];
 //printf("hererererere%d %d %d %d\n", newlines[0][0], newlines[0][1], newlines[0][2],newlines[0][3]);
 //printf("llllllllllll%d %d %d %d\n", l[0], l[1], l[2],l[3]);
 
-		if(l[3]>100 &&l[0]<40)
+		if(MIN(l[1],l[3])>150 && MAX(l[0],l[2])<150)
 		{
-			printf("nnnnnnnnnnnnnn\n");
+			//printf("nnnnnnnnnnnnnn\n");
+			count++;
 			line(img_line, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 255, 0), 1, CV_AA);
 			length=sqrt(pow((l[0]-l[2]),2.0)+pow((l[3]-l[1]),2.0));
 			if(i==0)
@@ -283,7 +286,10 @@ for (int i = 0; i < newlines.size(); i++)
 				tempv[2]=l[2];
 				tempv[3]=l[3];
 			}
-	
+		float tempa=atan2((l[3]-l[1]),(l[0]-l[2]));
+		tempa=toDegree(tempa);
+			avg_ang=avg_ang+tempa;
+			
 			
 
 
@@ -300,20 +306,74 @@ for (int i = 0; i < newlines.size(); i++)
 		}
 		
 	}
+		if(MAX(tempv[0], tempv[2])>170)
+		{
+		for (int i = 0; i < newlines.size(); i++)
+	{
+		 Vec4i l = newlines[i];
+//printf("hererererere%d %d %d %d\n", newlines[0][0], newlines[0][1], newlines[0][2],newlines[0][3]);
+//printf("llllllllllll%d %d %d %d\n", l[0], l[1], l[2],l[3]);
 
+		if(MIN(l[1],l[3])>230 )
+		{
+			printf("nnnnnnnnnnnnnn\n");
+			count++;
+			line(img_line, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 255, 0), 1, CV_AA);
+			length=sqrt(pow((l[0]-l[2]),2.0)+pow((l[3]-l[1]),2.0));
+			if(i==0)
+			{
+				max_length=length;
+				tempv[0]=l[0];
+				tempv[1]=l[1];
+				tempv[2]=l[2];
+				tempv[3]=l[3];
+			}
+			if(max_length<length)
+			{
+				max_length=length;
+				tempv[0]=l[0];
+				tempv[1]=l[1];
+				tempv[2]=l[2];
+				tempv[3]=l[3];
+			}
+		float tempa=atan2((l[3]-l[1]),(l[0]-l[2]));
+		tempa=toDegree(tempa);
+			avg_ang=avg_ang+tempa;
+			
+			
+
+
+
+
+
+
+		}
+		
+		////검출한 직선에서 왼쪽 아래직선들 중 길이가 가장 긴 직선 검출(정확성을 위해)
+		else
+		{
+        	line(img_line, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 1, CV_AA);
+		}
+		
+	}
+		}
+		printf("count : %d\n",count);
+		avg_ang=avg_ang/count;
 		printf("tempv %d %d %d %d\n",tempv[0],tempv[1], tempv[2], tempv[3]);
+		circle(img_line, Point(tempv[0], tempv[1]), 2, CV_RGB(115, 50, 0), 2, CV_AA);
+		circle(img_line, Point(tempv[2], tempv[3]), 2, CV_RGB(115, 255, 224), 2, CV_AA);
 		line(img_line, Point(tempv[0],tempv[1]), Point(tempv[2], tempv[3]), Scalar(255,0,0),1 ,CV_AA);
 		printf("max length :%f\n", max_length);
 
-		thetas=atan2((tempv[3]-tempv[1]),(tempv[0]-tempv[2]));
-		thetas=toDegree(thetas);
+//		thetas=atan2((tempv[3]-tempv[1]),(tempv[0]-tempv[2]));
+		thetas=toDegree(avg_ang);
 		if(thetas>0)
 		{
-			robot_theta=90-thetas;
+			robot_theta=90-avg_ang;
 		}
 		if(thetas<0)
 		{
-			robot_theta=90-(-thetas);
+			robot_theta=90-(-avg_ang);
 			robot_theta_r=toRadian(robot_theta);
 			 tf::Transform cTransformation = getInitialTransformation();
 			pre_dAngleTurned=0;
@@ -327,7 +387,7 @@ for (int i = 0; i < newlines.size(); i++)
 			
 //			baseCmd.angular.z=0.2;
 		}
-		printf("robot_theta : %f theta:%f\n",robot_theta, thetas);
+		printf("robot_theta : %f theta:%f\n",robot_theta, avg_ang);
 		pub.publish(baseCmd);
 	namedWindow("Original", WINDOW_AUTOSIZE);
 	imshow("Original", img_line);

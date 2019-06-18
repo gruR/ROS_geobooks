@@ -167,100 +167,7 @@ doRotation(ros::Publisher &pubTeleop,  tf::Transform &initialTransformation,doub
 }
 
 
-void draw_line(Mat &img_line, vector<Vec4i> lines)
-{
-	
-	ros::NodeHandle  nhp;
-	pub = nhp.advertise<geometry_msgs::Twist>("/cmd_vel", 100);	
-	geometry_msgs::Twist baseCmd;
-	if (lines.size() == 0) return;
 
-
-	// In case of error, don't draw the line(s)
-	bool draw_right = true;
-	bool draw_left = true;
-	int width = img_line.cols;
-	int height = img_line.rows;
-	float length=0;
-
-	float robot_theta=0;
-	float robot_theta_r=0;
-	//Find slopes of all lines
-	//But only care about lines where abs(slope) > slope_threshold
-	float slope_threshold = 0.5;
-	vector<float> slopes;
-	vector<Vec4i> new_lines;
-	float theta=0;
-	
-	printf("lines size : %d/n",lines.size());
-	for (int i = 0; i < lines.size(); i++)
-	{
-		 Vec4i l = lines[i];
-//printf("%lf %lf %lf %lf\n", lines[0][0], lines[0][1], lines[0][2],lines[0][3]);
-//printf("%lf %lf %lf %lf\n", l[0], l[1], l[2],l[3]);
-
-		if(l[3]>1000 &&l[0]<1000)
-		{
-			line(img_line, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 255, 0), 1, CV_AA);
-			length=sqrt(pow((l[0]-l[2]),2.0)+pow((l[3]-l[1]),2.0));
-			if(i==0)
-			{
-				max_length=length;
-				tempv[0]=l[0];
-				tempv[1]=l[1];
-				tempv[2]=l[2];
-				tempv[3]=l[3];
-			}
-			if(max_length<length)
-			{
-				max_length=length;
-				tempv[0]=l[0];
-				tempv[1]=l[1];
-				tempv[2]=l[2];
-				tempv[3]=l[3];
-			}
-	
-			
-
-
-
-
-
-
-		}
-		
-		else
-		{
-        	line(img_line, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 1, CV_AA);
-		}	
-	}
-		line(img_line, Point(tempv[0],tempv[1]), Point(tempv[2], tempv[3]), Scalar(255,0,0),1 ,CV_AA);
-		printf("max length :%f\n", max_length);
-		theta=atan2((tempv[3]-tempv[1]),(tempv[0]-tempv[2]));
-		theta=toDegree(theta);
-		if(theta>0)
-		{
-			robot_theta=90-theta;
-		}
-		if(theta<0)
-		{
-			robot_theta=90-(-theta);
-			robot_theta_r=toRadian(robot_theta);
-			 tf::Transform cTransformation = getInitialTransformation();
-			pre_dAngleTurned=0;
-			doRotation(pub,cTransformation, robot_theta_r, 0.25);	
-			
-			
-			baseCmd.angular.z=0.2;
-		}
-		printf("robot_theta : %f theta:%f\n",robot_theta, theta);
-		pub.publish(baseCmd);
-
-
-
-
-
-}
 
 /*
 void publish(ros::Publisher &pubTeleop, float linear_x, float angular_z)
@@ -410,6 +317,11 @@ for (int i = 0; i < newlines.size(); i++)
 			robot_theta_r=toRadian(robot_theta);
 			 tf::Transform cTransformation = getInitialTransformation();
 			pre_dAngleTurned=0;
+
+		thetas=thetas+50;
+
+
+
 			doRotation(pub,cTransformation, robot_theta_r, 0.25);	
 			//뽑은 직선의 기울기 계산 후 회전
 			

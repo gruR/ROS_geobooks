@@ -172,7 +172,7 @@ void draw_line(Mat &img_line, vector<Vec4i> lines)
 	
 	ros::NodeHandle  nhp;
 	pub = nhp.advertise<geometry_msgs::Twist>("/cmd_vel", 100);	
-//	geometry_msgs::Twist baseCmd;
+	geometry_msgs::Twist baseCmd;
 	if (lines.size() == 0) return;
 
 
@@ -192,13 +192,15 @@ void draw_line(Mat &img_line, vector<Vec4i> lines)
 	vector<Vec4i> new_lines;
 	float theta=0;
 	
-
+	printf("lines size : %d/n",lines.size());
 	for (int i = 0; i < lines.size(); i++)
 	{
 		 Vec4i l = lines[i];
+//printf("%lf %lf %lf %lf\n", lines[0][0], lines[0][1], lines[0][2],lines[0][3]);
+//printf("%lf %lf %lf %lf\n", l[0], l[1], l[2],l[3]);
 
-		if(l[3]>400 &&l[0]<200)
-			{
+		if(l[3]>1000 &&l[0]<1000)
+		{
 			line(img_line, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 255, 0), 1, CV_AA);
 			length=sqrt(pow((l[0]-l[2]),2.0)+pow((l[3]-l[1]),2.0));
 			if(i==0)
@@ -218,14 +220,15 @@ void draw_line(Mat &img_line, vector<Vec4i> lines)
 				tempv[3]=l[3];
 			}
 	
+			
 
 
 
 
 
 
-
-			}
+		}
+		
 		else
 		{
         	line(img_line, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 1, CV_AA);
@@ -248,10 +251,10 @@ void draw_line(Mat &img_line, vector<Vec4i> lines)
 			doRotation(pub,cTransformation, robot_theta_r, 0.25);	
 			
 			
-//			baseCmd.angular.z=2.0;
+			baseCmd.angular.z=0.2;
 		}
 		printf("robot_theta : %f theta:%f\n",robot_theta, theta);
-//		pub.publish(baseCmd);
+		pub.publish(baseCmd);
 
 
 
@@ -275,15 +278,37 @@ void poseMessageReceivedRGB(const sensor_msgs::ImageConstPtr& msg)
 //	ros::NodeHandle nhp;
 //	ros::Publisher pub = nhp.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
 //	geometry_msgs::Twist baseCmd;
+	ros::NodeHandle  nhp;
+	pub = nhp.advertise<geometry_msgs::Twist>("/cmd_vel", 100);	
+	geometry_msgs::Twist baseCmd;
+
+
+
+	// In case of error, don't draw the line(s)
+	bool draw_right = true;
+	bool draw_left = true;
+
+	float length=0;
+
+	float robot_theta=0;
+	float robot_theta_r=0;
+	//Find slopes of all lines
+	//But only care about lines where abs(slope) > slope_threshold
+	float slope_threshold = 0.5;
+	vector<float> slopes;
+	vector<Vec4i> new_lines;
+	float thetas=0;
 
 	float rho = 2; // distance resolution in pixels of the Hough grid
 	float theta = 1 * CV_PI / 180; // angular resolution in radians of the Hough grid
 	float hough_threshold = 15;	 // minimum number of votes(intersections in Hough grid cell)
 	float minLineLength = 10; //minimum number of pixels making up a line
 	float maxLineGap = 20;	//maximum gap in pixels between connectable line segments
+
+
 	
 
-
+	printf("hhhhhhhh\n");
 	Mat img = cv_bridge::toCvShare(msg, "bgr8")->image;
 	Mat gray0;
 	cvtColor(img, gray0, CV_BGR2GRAY);
@@ -296,17 +321,102 @@ void poseMessageReceivedRGB(const sensor_msgs::ImageConstPtr& msg)
 //	resize(img_rsz,img_rsz, Size(555,555),0,0,CV_INTER_LINEAR);
 //	printf("row: %d cols: %d\n",img_rsz.rows, img_rsz.cols);
 	GaussianBlur(img_rsz, img_rsz, Size(5,5), 1 ,1);
- 	Canny(img_rsz, img_rsz, 125, 250);
-	threshold(img_rsz, img_rsz, 170,255,THRESH_BINARY);
-
-
-	vector<Vec4i> lines;
-	HoughLinesP(img_rsz, lines, 1, theta, 20);
+ 	Canny(img_rsz, img_rsz, 125, 250); //////////캐니엣지 변환
+	threshold(img_rsz, img_rsz, 170,255,THRESH_BINARY); ///이진
 	Mat img_line = Mat::zeros(img_rsz.rows, img_rsz.cols, CV_8UC3);
+	int width = img_line.cols;
+	int height = img_line.rows;
 
-	draw_line(img_line, lines);
+
+vector<Vec4i> newlines;
+	vector<Vec4i> lines;
+	HoughLinesP(img_rsz, lines, 1, theta, 20);/////////////////하프 라인변환(직선검출)
 
 
+
+for(int i=0; i<lines.size(); i++)
+{
+printf("yyyyyyyyyy%d %d %d %d\n", lines[i][0], lines[i][1], lines[i][2],lines[i][3]);
+newlines=lines;
+}
+
+//printf("%d %d %d %d\n", newlines[0][0], newlines[0][1], newlines[0][2],newlines[0][3]);
+
+if(newlines.size()==0)
+return;
+
+
+//	draw_line(img_line, lines);
+//	printf("%d %d %d %d\n",lines[0][0], lines[0][1], lines[0][2], lines[0][3]);
+
+for (int i = 0; i < newlines.size(); i++)
+	{
+		 Vec4i l = newlines[i];
+//printf("hererererere%d %d %d %d\n", newlines[0][0], newlines[0][1], newlines[0][2],newlines[0][3]);
+//printf("llllllllllll%d %d %d %d\n", l[0], l[1], l[2],l[3]);
+
+		if(l[3]>100 &&l[0]<40)
+		{
+			printf("nnnnnnnnnnnnnn\n");
+			line(img_line, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 255, 0), 1, CV_AA);
+			length=sqrt(pow((l[0]-l[2]),2.0)+pow((l[3]-l[1]),2.0));
+			if(i==0)
+			{
+				max_length=length;
+				tempv[0]=l[0];
+				tempv[1]=l[1];
+				tempv[2]=l[2];
+				tempv[3]=l[3];
+			}
+			if(max_length<length)
+			{
+				max_length=length;
+				tempv[0]=l[0];
+				tempv[1]=l[1];
+				tempv[2]=l[2];
+				tempv[3]=l[3];
+			}
+	
+			
+
+
+
+
+
+
+		}
+		
+		////검출한 직선에서 왼쪽 아래직선들 중 길이가 가장 긴 직선 검출(정확성을 위해)
+		else
+		{
+        	line(img_line, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 1, CV_AA);
+		}
+		
+	}
+
+		printf("tempv %d %d %d %d\n",tempv[0],tempv[1], tempv[2], tempv[3]);
+		line(img_line, Point(tempv[0],tempv[1]), Point(tempv[2], tempv[3]), Scalar(255,0,0),1 ,CV_AA);
+		printf("max length :%f\n", max_length);
+
+		thetas=atan2((tempv[3]-tempv[1]),(tempv[0]-tempv[2]));
+		thetas=toDegree(thetas);
+		if(thetas>0)
+		{
+			robot_theta=90-thetas;
+		}
+		if(thetas<0)
+		{
+			robot_theta=90-(-thetas);
+			robot_theta_r=toRadian(robot_theta);
+			 tf::Transform cTransformation = getInitialTransformation();
+			pre_dAngleTurned=0;
+			doRotation(pub,cTransformation, robot_theta_r, 0.25);	
+			//뽑은 직선의 기울기 계산 후 회전
+			
+//			baseCmd.angular.z=0.2;
+		}
+		printf("robot_theta : %f theta:%f\n",robot_theta, thetas);
+		pub.publish(baseCmd);
 	namedWindow("Original", WINDOW_AUTOSIZE);
 	imshow("Original", img_line);
 
@@ -316,6 +426,35 @@ void poseMessageReceivedRGB(const sensor_msgs::ImageConstPtr& msg)
 
 	
 
+}
+
+
+void RGB_To_HSV(double r, double g, double b, double &h, double &s, double &v)
+{
+double max,min;
+max=MAX(r,g);
+max=MAX(max,b);
+min=MIN(r,g);
+min=MIN(min,b);
+v=max;
+s=(max !=0.0) ? (max-min)/max : 0.0 ;
+if(s==0.0)
+	h=0;
+else
+{
+	double delta=max-min;
+	if(r==max)
+		h=(g-b)/delta;
+	else if(g==max)
+		h=2.0+(b-r)/delta;
+	else if(b==max)
+		{
+		h=4.0+(r-g)/delta;
+		h+=60.0;
+	if(h<0.0)
+		h+=460.0;
+		}
+}
 }
 
 int main(int argc, char **argv)
@@ -329,11 +468,14 @@ int main(int argc, char **argv)
 	ros::Publisher pub = nhp.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
 	
 //	ros::Publisher pub = nhp.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
-	image_transport::Subscriber subRGB = it.subscribe("/raspicam_node/image", 1, &poseMessageReceivedRGB,
+	image_transport::Subscriber subRGB = it.subscribe("/camera/image", 1, &poseMessageReceivedRGB,
 	ros::VoidPtr(), image_transport::TransportHints("compressed"));
 	printf("j : %d\n",j);
 	j++;
-	
+
+//	double a,b,c;
+//	RGB_To_HSV(235,237,114,a,b,c);
+//	printf("h: %f, s:%f, v:%f\n",a,b,c);	
 
 	ros::spin();
 	return 0;

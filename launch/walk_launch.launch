@@ -10,9 +10,9 @@
 </include>
 <!-- Launch Walker Node -->
 <node 
-    pkg = "turtlebot_roomba" 
-    type = "turtlebot_roomba_node"
-    name = "turtlebot_roomba_node"
+    pkg = "ros_geobooks" 
+    type = "lidar_node"
+    name = "lidar_node"
     output = "screen"
 />
 <!-- Record rosbag if prompted -->
@@ -20,7 +20,7 @@
     pkg = "rosbag"
     name = "record"
     type = "record"
-    args = "-a -x /camera/(.*) -O $(find turtlebot_roomba)/results/turtlebotWalker.bag"
+    args = "-a -x /camera/(.*) -O $(find ros_geobooks)/results/turtlebotWalker.bag"
     output = "screen"
     if = "$(arg rosbagRecord)"
 />  

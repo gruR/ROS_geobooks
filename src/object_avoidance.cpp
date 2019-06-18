@@ -3,11 +3,11 @@
 #include <vector>
 #include <ros/console.h>
 
-#include "Walker.hpp"
+#include "object_avoidance.hpp"
 
 Walker::Walker(ros::NodeHandle &n) : n_(n) 
 {
-  ROS_INFO_STREAM("Walker Node Initialized!\n");
+  //ROS_INFO_STREAM("Lidar Node Initialized!\n");
 
   // Setup the velocity publisher topic with master
   velocityPub_ =
@@ -94,7 +94,7 @@ void Walker::navigate(bool changeCourse)
 int main(int argc, char **argv)
 {
 
-  ros::init(argc, argv, "turtlebot_walker");
+  ros::init(argc, argv, "Lidar_node");
   ros::NodeHandle nh;
 
   // Change logger level to DEBUG.

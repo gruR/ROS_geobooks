@@ -94,7 +94,7 @@ void Walker::navigate(bool changeCourse)
 int main(int argc, char **argv)
 {
 
-  ros::init(argc, argv, "Lidar_node");
+  ros::init(argc, argv, "lidar_node");
   ros::NodeHandle nh;
 
   // Change logger level to DEBUG.

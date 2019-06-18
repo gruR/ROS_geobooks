@@ -1,4 +1,4 @@
-# TurtleBot Roomba -  A simple walker algorithm for a cleaner robot.
+# walker
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 

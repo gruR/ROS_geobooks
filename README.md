@@ -3,7 +3,9 @@
 team8_geobooks repository has all files.
 ----------------------------------------
 
-myopencv_realimg.cpp is real code
+In autorace part, turtlebot_autorace repository is only for turtlebot's camera launch.
+
+knu_ros_lecture's myopencv_realimg.cpp is real code
 
 지정되어있는 사진에서 라인을 딴 후,
 제일 아래쪽의 선을 따와서 선의 기울기를 이용하여

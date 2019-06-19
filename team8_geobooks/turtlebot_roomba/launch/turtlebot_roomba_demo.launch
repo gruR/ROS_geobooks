@@ -1,0 +1,14 @@
+<launch>
+
+<include file= "$(find turtlebot_gazebo)/launch/turtlebot_world.launch" >
+<arg name="world_file" value="/opt/ros/kinetic/share/turtlebot_gazebo/worlds/corridor.world"/>
+</include>
+
+<node 
+    pkg = "turtlebot_roomba" 
+    type = "turtlebot_roomba_node"
+    name = "avoid_collision_node"
+    output = "screen"
+/>
+
+</launch>

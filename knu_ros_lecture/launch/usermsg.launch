@@ -1,0 +1,6 @@
+<launch>
+<node name="user_msg_publisher_tutorial" pkg="knu_ros_lecture"
+type="user_msg_publisher_tutorial" output="screen"/>
+<node name="user_msg_subscriber_tutorial" pkg="knu_ros_lecture"
+type="user_msg_subscriber_tutorial" output="screen"/>
+</launch>

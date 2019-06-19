@@ -1,0 +1,7 @@
+<launch>
+<node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node"/>
+<node name="turtlesim_random_move" pkg="knu_ros_lecture"
+type="turtlesim_random_move" output="screen"/>
+<node name="turtlesim_pose" pkg="knu_ros_lecture"
+type="turtlesim_pose" output="screen"/>
+</launch>

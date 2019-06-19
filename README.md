@@ -1,5 +1,8 @@
 # ROS_geobooks
 
+team8_geobooks repository has all files.
+----------------------------------------
+
 myopencv_realimg.cpp is real code
 
 지정되어있는 사진에서 라인을 딴 후,
